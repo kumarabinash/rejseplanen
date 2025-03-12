@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from "react";
-import { DepartureBoardParams } from "./types/departure-board";
+import { DepartureBoardParams, DepartureBoardResponse, Departure } from "./types/departure-board";
 import { useRouter } from "next/navigation";
 
 interface DepartureItem {
@@ -33,7 +33,7 @@ interface Configuration {
   };
 }
 
-const fetchDepartures = async (params: DepartureBoardParams) => {
+const fetchDepartures = async (params: DepartureBoardParams): Promise<DepartureBoardResponse> => {
   const queryParams = new URLSearchParams();
   Object.entries(params).forEach(([key, value]) => {
       if (value !== undefined) {
@@ -48,12 +48,12 @@ const fetchDepartures = async (params: DepartureBoardParams) => {
   return response.json();
 };
 
-const getItems = (res: any): DepartureItem[] => {
+const getItems = (res: DepartureBoardResponse): DepartureItem[] => {
   if (!res.Departure) {
     return [];
   }
 
-  const items = res.Departure.map((departure: any) => {
+  const items = res.Departure.map((departure: Departure) => {
     const {
       direction: to,
       rtTrack: platform,

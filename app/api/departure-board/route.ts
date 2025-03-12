@@ -16,12 +16,11 @@ export async function GET(request: Request) {
         // ... add other parameters as needed
     };
 
-    console.log(params);
-
     try {
         const data = await fetchDepartureBoard(params);
         return NextResponse.json(data);
     } catch (error) {
+        console.error('Error fetching departure board:', error);
         return NextResponse.json(
             { error: 'Failed to fetch departure board' },
             { status: 500 }
