@@ -42,7 +42,6 @@ export const fetchDepartureBoard = async (params: DepartureBoardParams) => {
         }
     });
 
-    console.log(url.toString());
     // Make the request
     const response = await fetch(url.toString());
 

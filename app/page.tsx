@@ -36,6 +36,48 @@ interface Configuration {
   };
 }
 
+const getRemainingTime = (item: DepartureItem) => {
+    const targetDate = new Date(`${item.date}T${item.time}`);
+    const now = new Date();
+    const total = targetDate.getTime() - now.getTime();
+
+    const seconds = Math.floor((total / 1000) % 60);
+    const minutes = Math.floor((total / 1000 / 60) % 60);
+    const hours = Math.floor((total / (1000 * 60 * 60)) % 24);
+    const days = Math.floor(total / (1000 * 60 * 60 * 24));
+
+    return {
+      total,
+      days,
+      hours,
+      minutes,
+      seconds
+    };
+  }
+
+  const populateEta = (items: DepartureItem[]) => {
+    const updatedItems = items.map((item) => {
+        const { minutes, seconds } = getRemainingTime(item);
+
+        let eta;
+
+        if (minutes === 0 && seconds < 30 && seconds > 0) {
+          eta = 'Nu'
+        } else if (minutes < 0 && seconds <= 0) {
+          eta = 'Rejste'
+        } else {
+          eta = `${minutes}m`
+        }
+
+        return {
+          ...item,
+          eta,
+        }
+      });
+
+      return updatedItems;
+  }
+
 const fetchDepartures = async (params: DepartureBoardParams): Promise<DepartureBoardResponse> => {
   const queryParams = new URLSearchParams();
   Object.entries(params).forEach(([key, value]) => {
@@ -108,7 +150,6 @@ export default function Home() {
 
       const res = await fetchDepartures(params);
       const departureItems = getItems(res);
-      console.log('Departure items:', departureItems); // Debug log
       departureItems.sort((a, b) => {
         // First compare by type, ensuring we handle undefined/null cases
         if (!a.type || !b.type) {
@@ -118,9 +159,11 @@ export default function Home() {
           return a.type.localeCompare(b.type);
         }
         
-        return b.time.localeCompare(a.time);
+        return a.time.localeCompare(b.time);
       });
-      setItems(departureItems);
+
+      const updatedItems = populateEta(departureItems);
+      setItems(updatedItems);
     } catch (error) {
       console.error('Error fetching departures:', error);
       router.push('/configure');
@@ -132,50 +175,16 @@ export default function Home() {
   }, [])
 
   useEffect(() => {
+    // setItems(populateEta(items));
+
     const timerId = setInterval(() => {
-      const updatedItems = items.map((item) => {
-        const { minutes, seconds } = getRemainingTime(item);
-
-        let eta;
-
-        if (minutes === 0 && seconds < 30 && seconds > 0) {
-          eta = 'Nu'
-        } else if (minutes < 0 && seconds <= 0) {
-          eta = 'Rejste'
-        } else {
-          eta = `${minutes}`
-        }
-
-        return {
-          ...item,
-          eta,
-        }
-      });
+      const updatedItems = populateEta(items);
 
       setItems(updatedItems);
     }, 10000);
 
     return () => clearInterval(timerId);
   }, [items])
-
-  const getRemainingTime = (item: DepartureItem) => {
-    const targetDate = new Date(`${item.date}T${item.time}`);
-    const now = new Date();
-    const total = targetDate.getTime() - now.getTime();
-
-    const seconds = Math.floor((total / 1000) % 60);
-    const minutes = Math.floor((total / 1000 / 60) % 60);
-    const hours = Math.floor((total / (1000 * 60 * 60)) % 24);
-    const days = Math.floor(total / (1000 * 60 * 60 * 24));
-
-    return {
-      total,
-      days,
-      hours,
-      minutes,
-      seconds
-    };
-  }
 
   const formatTime = (timeString: string): string => {
     // Split the time string and take only hours and minutes
@@ -218,7 +227,20 @@ export default function Home() {
                     </div>
                     <div className="text-right">
                       <div className="text-3xl font-bold text-gray-800">{formatTime(item.time)}</div>
-                      <div className={`text-2xl font-bold ${item.eta === 'Nu' ? 'text-green-600' : item.eta === 'Rejste' ? 'text-red-600' : 'text-[rgb(228,148,62)]'}`}>
+                      <div className={`text-2xl font-bold ${
+                        item.eta === 'Nu' ? 'text-green-600' : 
+                        item.eta === 'Rejste' ? 'text-red-600' : 
+                        (() => {
+                          const minutes = parseInt(item.eta || '0');
+                          if (minutes < 5) return 'text-red-900';
+                          if (minutes < 10) return 'text-red-600';
+                          if (minutes < 15) return 'text-orange-500';
+                          if (minutes < 20) return 'text-yellow-500';
+                          if (minutes < 25) return 'text-green-400';
+                          if (minutes < 30) return 'text-green-600';
+                          return 'text-[rgb(228,148,62)]';
+                        })()
+                      }`}>
                         {item.eta}
                       </div>
                     </div>
