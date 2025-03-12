@@ -58,7 +58,7 @@ export default function Configure() {
     },
   });
 
-  const hasSavedConfig = Boolean(window.localStorage.getItem('rejseplanen-config'));
+  const hasSavedConfig = window.localStorage.getItem('rejseplanen-config') !== null;
 
   const [locationSuggestions, setLocationSuggestions] = useState<LocationSuggestion[]>([]);
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
