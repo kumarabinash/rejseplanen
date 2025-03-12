@@ -148,7 +148,6 @@ export default function Configure() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     localStorage.setItem('rejseplanen-config', JSON.stringify(config));
-    console.log('Configuration saved to localStorage');
     router.push('/');
   };
 

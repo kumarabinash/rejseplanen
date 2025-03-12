@@ -193,41 +193,70 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4 relative">
-      <div className="max-w-4xl mx-auto space-y-4">
+    <div className="min-h-screen bg-gray-100 p-2 sm:p-4 relative">
+      <div className="max-w-4xl mx-auto space-y-2 sm:space-y-4">
         {items.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-md p-8 text-center">
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">No upcoming departures available at</h2>
-            <h1 className="text-4xl font-bold text-gray-800 mb-4">{config?.location.name}</h1>
+          <div className="bg-white rounded-lg shadow-md p-4 sm:p-8 text-center">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-2">No upcoming departures available at</h2>
+            <h1 className="text-2xl sm:text-4xl font-bold text-gray-800 mb-4">{config?.location.name}</h1>
             <p className="text-gray-600">Please check back later or try a different time.</p>
           </div>
         ) : (
           items.map((item) => (
             <div 
               key={`${item.date}-${item.time}-${item.to}`} 
-              className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-200"
+              className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-200 relative"
             >
-              <div className="flex items-center p-4">
-                <div className="flex-shrink-0 w-16 h-16 bg-[rgb(228,148,62)] rounded-lg flex flex-col items-center justify-center text-white text-center">
-                  <span className="font-bold text-sm">{item.name}</span>
+
+              {item.type === 'prod_bus' ? (
+                <FaBus className="absolute -top-16 h-38 w-38 right-5 opacity-3 text-black overflow-hidden" />
+              ) : item.type === 'prod_comm' ? (
+                <FaTrain className="absolute -top-16 h-38 w-38 right-5 opacity-3 text-black overflow-hidden" />
+              ) : null}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center p-3 sm:p-4">
+                <div className="w-full sm:w-auto flex items-center gap-2 mb-2 sm:mb-0 justify-between sm:flex-row">
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 bg-[rgb(228,148,62)] rounded-lg flex flex-col items-center justify-center text-white text-center">
+                    <span className="font-bold text-xs sm:text-sm">
+                      {item.name}
+                      </span>
+                  </div>
+                  <div className="flex-col items-center text-right gap-2 sm:hidden">
+                    <div className="text-xl font-bold text-gray-800">{formatTime(item.time)}</div>
+                    <div className={`text-lg font-bold ${
+                      item.eta === 'Nu' ? 'text-green-600' : 
+                      item.eta === 'Rejste' ? 'text-red-600' : 
+                      (() => {
+                        const minutes = parseInt(item.eta || '0');
+                        if (minutes < 5) return 'text-red-900';
+                        if (minutes < 10) return 'text-red-600';
+                        if (minutes < 15) return 'text-orange-500';
+                        if (minutes < 20) return 'text-yellow-500';
+                        if (minutes < 25) return 'text-green-400';
+                        if (minutes < 30) return 'text-green-600';
+                        return 'text-[rgb(228,148,62)]';
+                      })()
+                    }`}>
+                      {item.eta}
+                    </div>
+                  </div>
                 </div>
                 
-                <div className="ml-4 flex-grow">
-                  <div className="flex items-center justify-between">
-                    <div>
+                <div className="ml-0 sm:ml-4 flex-grow w-full">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-0">
+                    <div className="w-full sm:w-auto">
                       <div className="flex items-center gap-2">
-                        {item.type === 'prod_bus' ? (
-                          <FaBus className="w-5 h-5 text-[rgb(228,148,62)]" />
+                      {item.type === 'prod_bus' ? (
+                          <FaBus className="w-4 h-4 sm:w-5 sm:h-5 text-[rgb(228,148,62)]" />
                         ) : item.type === 'prod_comm' ? (
-                          <FaTrain className="w-5 h-5 text-[rgb(228,148,62)]" />
-                        ) : null}
-                        <h2 className="text-2xl font-bold text-gray-800 truncate">{item.to}</h2>
+                          <FaTrain className="w-4 h-4 sm:w-5 sm:h-5 text-[rgb(228,148,62)]" />
+                        ) : null} 
+                        <h2 className="text-lg sm:text-2xl font-bold text-gray-800 truncate">{item.to}</h2>
                       </div>
-                      <p className="text-gray-600">From: {item.from}</p>
+                      <p className="text-sm sm:text-base text-gray-600">From: {item.from}</p>
                     </div>
-                    <div className="text-right">
-                      <div className="text-3xl font-bold text-gray-800">{formatTime(item.time)}</div>
-                      <div className={`text-2xl font-bold ${
+                    <div className="hidden sm:block text-right w-full sm:w-auto">
+                      <div className="text-xl sm:text-3xl font-bold text-gray-800">{formatTime(item.time)}</div>
+                      <div className={`text-lg sm:text-2xl font-bold ${
                         item.eta === 'Nu' ? 'text-green-600' : 
                         item.eta === 'Rejste' ? 'text-red-600' : 
                         (() => {
@@ -247,7 +276,7 @@ export default function Home() {
                   </div>
 
                   {item.platform && ( 
-                    <div className="mt-2 text-sm text-gray-500">
+                    <div className="mt-2 text-xs sm:text-sm text-gray-500">
                       Platform: {item.platform}
                     </div>
                   )}
@@ -260,12 +289,12 @@ export default function Home() {
 
       <button
         onClick={() => router.push('/configure')}
-        className="fixed bottom-6 right-6 bg-[rgb(228,148,62)] text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-shadow duration-200 flex items-center justify-center"
+        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 bg-[rgb(228,148,62)] text-white p-3 sm:p-4 rounded-full shadow-lg hover:shadow-xl transition-shadow duration-200 flex items-center justify-center"
         aria-label="Configure"
       >
         <svg 
           xmlns="http://www.w3.org/2000/svg" 
-          className="h-6 w-6" 
+          className="h-5 w-5 sm:h-6 sm:w-6" 
           fill="none" 
           viewBox="0 0 24 24" 
           stroke="currentColor"
