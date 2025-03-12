@@ -23,10 +23,6 @@ interface LocationSuggestion {
   extId: string;
 }
 
-interface TooltipProps {
-  text: string;
-}
-
 const fetchLocationSearch = async (params: LocationSearchParams) => {
   const queryParams = new URLSearchParams();
   Object.entries(params).forEach(([key, value]) => {
