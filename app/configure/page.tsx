@@ -105,9 +105,10 @@ export default function Configure() {
     if (!shouldSearchLocation || loadingField === null) {
       return;
     }
-
     const timeoutId = setTimeout(() => {
-      debouncedSearch(config[loadingField].name, setIsLoadingLocation, setLocationSuggestions);
+      if (loadingField === 'location' || loadingField === 'direction') {
+        debouncedSearch(config[loadingField].name, setIsLoadingLocation, setLocationSuggestions);
+      }
     }, 500);
 
     return () => clearTimeout(timeoutId);

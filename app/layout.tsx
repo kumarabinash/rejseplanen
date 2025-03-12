@@ -1,3 +1,4 @@
+import { Analytics } from '@vercel/analytics/next';
 import type { Metadata } from "next";
 import { Martian_Mono } from "next/font/google";
 import "./globals.css";
@@ -25,6 +26,7 @@ export default function RootLayout({
         className={`${martianMono.className}  antialiased bg-white`}
       >
         {children}
+        <Analytics />
       </body>
     </html>
   );

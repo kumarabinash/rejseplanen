@@ -102,7 +102,24 @@ export default function Home() {
 
       const res = await fetchDepartures(params);
       const departureItems = getItems(res);
-      departureItems.sort((a, b) => (a.type - b.type));
+      console.log('Departure items:', departureItems); // Debug log
+      departureItems.sort((a, b) => {
+        // First compare by type, ensuring we handle undefined/null cases
+        if (!a.type || !b.type) {
+          return 0;
+        }
+        // Convert types to strings to ensure localeCompare works
+        const typeA = String(a.type);
+        const typeB = String(b.type);
+        if (typeA !== typeB) {
+          return typeA.localeCompare(typeB);
+        }
+        // If types are the same, compare by time
+        if (!a.time || !b.time) {
+          return 0;
+        }
+        return a.time.localeCompare(b.time);
+      });
       setItems(departureItems);
     } catch (error) {
       console.error('Error fetching departures:', error);
