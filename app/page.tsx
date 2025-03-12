@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { DepartureBoardParams, DepartureBoardResponse, Departure } from "./types/departure-board";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -123,7 +123,7 @@ const getItems = (res: DepartureBoardResponse): DepartureItem[] => {
   return items;
 }
 
-export default function Home() {
+function DepartureBoard() {
   const router = useRouter();
   const [items, setItems] = useState<DepartureItem[]>([]);
   const [config, setConfig] = useState<Configuration | null>(null);
@@ -205,11 +205,8 @@ export default function Home() {
   }, [])
 
   useEffect(() => {
-    // setItems(populateEta(items));
-
     const timerId = setInterval(() => {
       const updatedItems = populateEta(items);
-
       setItems(updatedItems);
     }, 10000);
 
@@ -217,7 +214,6 @@ export default function Home() {
   }, [items])
 
   const formatTime = (timeString: string): string => {
-    // Split the time string and take only hours and minutes
     const [hours, minutes] = timeString.split(':');
     return `${hours}:${minutes}`;
   }
@@ -344,5 +340,17 @@ export default function Home() {
         </svg>
       </button>
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-2 sm:p-4 flex items-center justify-center">
+        <div className="text-xl text-gray-800 dark:text-gray-200">Loading...</div>
+      </div>
+    }>
+      <DepartureBoard />
+    </Suspense>
   );
 }
