@@ -1,7 +1,9 @@
 import { Analytics } from '@vercel/analytics/next';
 import type { Metadata } from "next";
 import { Martian_Mono } from "next/font/google";
+import { Toaster } from 'react-hot-toast';
 import "./globals.css";
+import 'react-tooltip/dist/react-tooltip.css'
 
 const martianMono = Martian_Mono({
   variable: "--font-martian-mono",
@@ -26,6 +28,7 @@ export default function RootLayout({
         className={`${martianMono.className}  antialiased bg-white`}
       >
         {children}
+        <Toaster position="bottom-center" />
         <Analytics />
       </body>
     </html>

@@ -42,8 +42,6 @@ export const fetchLocationSearch = async (params: LocationSearchParams) => {
     const {stopLocationOrCoordLocation} = json;
 
     return stopLocationOrCoordLocation.filter((location:any) => location.StopLocation).map((location:any) => {
-        console.log(location);
-
 
         return ({
             id: location.StopLocation.id,
