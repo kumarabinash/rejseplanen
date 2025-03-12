@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { LocationSearchParams } from '@/app/types/location-search';
 import { useRouter } from 'next/navigation';
 import { FaCopy, FaSave, FaTimes, FaInfoCircle } from "react-icons/fa";
@@ -58,7 +58,7 @@ export default function Configure() {
     },
   });
 
-  const hasSavedConfig = window.localStorage.getItem('rejseplanen-config') !== null;
+  const hasSavedConfig = useMemo(() => localStorage.getItem('rejseplanen-config') !== null, []);
 
   const [locationSuggestions, setLocationSuggestions] = useState<LocationSuggestion[]>([]);
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
