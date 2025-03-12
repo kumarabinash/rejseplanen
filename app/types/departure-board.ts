@@ -16,7 +16,9 @@ export interface DepartureBoardParams {
 }
 
 export interface Product {
-    icon: string;
+    icon: {
+        res: string;
+    };
 }
 
 export interface Departure {

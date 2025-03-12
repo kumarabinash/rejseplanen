@@ -8,11 +8,11 @@ export async function GET(request: Request) {
     // Convert searchParams to DepartureBoardParams
     const params: DepartureBoardParams = {
         date: searchParams.get('date') || undefined,
-        time: searchParams.get('time') || '07:00',
+        time: searchParams.get('time') || undefined,
         duration: Number(searchParams.get('duration')) || 10,
         id: searchParams.get('id') || undefined,
         direction: searchParams.get('direction') || undefined,
-        products: 16, // todo train
+        products: Number(searchParams.get('products')) || 16,
         // ... add other parameters as needed
     };
 

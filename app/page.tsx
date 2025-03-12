@@ -4,6 +4,9 @@ import { useEffect, useState } from "react";
 import { DepartureBoardParams, DepartureBoardResponse, Departure } from "./types/departure-board";
 import { useRouter } from "next/navigation";
 
+import { FaTrain } from "react-icons/fa6";
+import { FaBus } from "react-icons/fa6";
+
 interface DepartureItem {
   type: string;
   to: string;
@@ -65,7 +68,7 @@ const getItems = (res: DepartureBoardResponse): DepartureItem[] => {
     } = departure;
 
     return {
-      type: product[0].icon,
+      type: product[0].icon.res,
       to,
       platform,
       from,
@@ -81,6 +84,7 @@ const getItems = (res: DepartureBoardResponse): DepartureItem[] => {
 export default function Home() {
   const router = useRouter();
   const [items, setItems] = useState<DepartureItem[]>([]);
+  const [config, setConfig] = useState<Configuration | null>(null);
 
   const populateDepartureItems = async () => {
     const savedConfig = localStorage.getItem('rejseplanen-config');
@@ -90,6 +94,8 @@ export default function Home() {
       return;
     }
 
+    setConfig(JSON.parse(savedConfig));
+
     try {
       const config: Configuration = JSON.parse(savedConfig);
       
@@ -97,7 +103,7 @@ export default function Home() {
         id: config.location.extId,
         duration: config.duration,
         direction: config.direction.extId,
-        products: (config.products.bus ? 4 : 0) | (config.products.train ? 16 : 0)
+        products: (config.products.bus ? 32 : 0) | (config.products.train ? 16 : 0)
       };
 
       const res = await fetchDepartures(params);
@@ -108,17 +114,11 @@ export default function Home() {
         if (!a.type || !b.type) {
           return 0;
         }
-        // Convert types to strings to ensure localeCompare works
-        const typeA = String(a.type);
-        const typeB = String(b.type);
-        if (typeA !== typeB) {
-          return typeA.localeCompare(typeB);
+        if (a.type !== b.type) {
+          return a.type.localeCompare(b.type);
         }
-        // If types are the same, compare by time
-        if (!a.time || !b.time) {
-          return 0;
-        }
-        return a.time.localeCompare(b.time);
+        
+        return b.time.localeCompare(a.time);
       });
       setItems(departureItems);
     } catch (error) {
@@ -177,39 +177,63 @@ export default function Home() {
     };
   }
 
+  const formatTime = (timeString: string): string => {
+    // Split the time string and take only hours and minutes
+    const [hours, minutes] = timeString.split(':');
+    return `${hours}:${minutes}`;
+  }
+
   return (
     <div className="min-h-screen bg-gray-100 p-4 relative">
       <div className="max-w-4xl mx-auto space-y-4">
-        {items.map((item) => (
-          <div 
-            key={`${item.date}-${item.time}-${item.to}`} 
-            className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-200"
-          >
-            <div className="flex items-center p-4">
-              <div className="flex-shrink-0 w-16 h-16 bg-[rgb(228,148,62)] rounded-lg flex items-center justify-center text-white font-bold">
-                {item.name}
-              </div>
-              
-              <div className="ml-4 flex-grow">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h2 className="text-2xl font-bold text-gray-800">{item.to}</h2>
-                    <p className="text-gray-600">From: {item.from}</p>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-3xl font-bold text-gray-800">{item.time}</div>
-                    <div className={`text-2xl font-bold ${item.eta === 'Nu' ? 'text-green-600' : item.eta === 'Rejste' ? 'text-red-600' : 'text-[rgb(228,148,62)]'}`}>
-                      {item.eta}
+        {items.length === 0 ? (
+          <div className="bg-white rounded-lg shadow-md p-8 text-center">
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">No upcoming departures available at</h2>
+            <h1 className="text-4xl font-bold text-gray-800 mb-4">{config?.location.name}</h1>
+            <p className="text-gray-600">Please check back later or try a different time.</p>
+          </div>
+        ) : (
+          items.map((item) => (
+            <div 
+              key={`${item.date}-${item.time}-${item.to}`} 
+              className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-200"
+            >
+              <div className="flex items-center p-4">
+                <div className="flex-shrink-0 w-16 h-16 bg-[rgb(228,148,62)] rounded-lg flex flex-col items-center justify-center text-white text-center">
+                  <span className="font-bold text-sm">{item.name}</span>
+                </div>
+                
+                <div className="ml-4 flex-grow">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        {item.type === 'prod_bus' ? (
+                          <FaBus className="w-5 h-5 text-[rgb(228,148,62)]" />
+                        ) : item.type === 'prod_comm' ? (
+                          <FaTrain className="w-5 h-5 text-[rgb(228,148,62)]" />
+                        ) : null}
+                        <h2 className="text-2xl font-bold text-gray-800 truncate">{item.to}</h2>
+                      </div>
+                      <p className="text-gray-600">From: {item.from}</p>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-3xl font-bold text-gray-800">{formatTime(item.time)}</div>
+                      <div className={`text-2xl font-bold ${item.eta === 'Nu' ? 'text-green-600' : item.eta === 'Rejste' ? 'text-red-600' : 'text-[rgb(228,148,62)]'}`}>
+                        {item.eta}
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="mt-2 text-sm text-gray-500">
-                  Platform: {item.platform}
+
+                  {item.platform && ( 
+                    <div className="mt-2 text-sm text-gray-500">
+                      Platform: {item.platform}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
 
       <button
