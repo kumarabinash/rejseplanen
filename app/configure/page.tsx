@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { LocationSearchParams } from '@/app/types/location-search';
 import { useRouter } from 'next/navigation';
 import { FaCopy, FaSave, FaTimes, FaInfoCircle } from "react-icons/fa";
@@ -57,8 +57,6 @@ export default function Configure() {
       extId: '',
     },
   });
-
-  const hasSavedConfig = useMemo(() => localStorage.getItem('rejseplanen-config') !== null, []);
 
   const [locationSuggestions, setLocationSuggestions] = useState<LocationSuggestion[]>([]);
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
@@ -313,17 +311,15 @@ export default function Configure() {
         </div>
 
         <div className="flex gap-2">
-          {hasSavedConfig ? (
-            <button
-              type="button"
-              onClick={() => {
-                router.push('/');
-              }}
-              className="w-full bg-red-500 text-white py-3 px-4 rounded-md hover:bg-red-600 transition-colors cursor-pointer flex items-center justify-center gap-2"
-            >
-              <FaTimes className="w-5 h-5" />
-            </button>
-          ) : null}
+          <button
+            type="button"
+            onClick={() => {
+              router.push('/');
+            }}
+            className="w-full bg-red-500 text-white py-3 px-4 rounded-md hover:bg-red-600 transition-colors cursor-pointer flex items-center justify-center gap-2"
+          >
+            <FaTimes className="w-5 h-5" />
+          </button>
 
           <button
             type="submit"
