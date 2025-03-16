@@ -3,9 +3,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { LocationSearchParams } from '@/app/types/location-search';
 import { useRouter } from 'next/navigation';
-import { FaCopy, FaSave, FaTimes, FaInfoCircle } from "react-icons/fa";
+import { FaCopy, FaSave, FaTimes, FaInfoCircle, FaMapMarkerAlt } from "react-icons/fa";
 import { toast } from 'react-hot-toast';
 import Tooltip from '@mui/material/Tooltip';
+import { BiCurrentLocation } from "react-icons/bi";
 
 interface Configuration {
   location: LocationSuggestion;
@@ -174,12 +175,20 @@ export default function Configure() {
       <h1 className="text-2xl font-bold mb-4 dark:text-white">Configure</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="relative">
-          <label htmlFor="location" className="block text-sm font-medium mb-1 dark:text-gray-200">
-            Location
-            <Tooltip title="Enter the starting point for your journey (e.g., city name, station, or address)" className="font-martian-mono">
-              <FaInfoCircle className="ml-1 w-4 h-4 text-gray-500 dark:text-gray-400 inline-block cursor-help" />
-            </Tooltip>
-          </label>
+          <div className="flex items-center justify-between">
+
+            <label htmlFor="location" className="block text-sm font-medium mb-1 dark:text-gray-200">
+              Location
+              <Tooltip title="Enter the starting point for your journey (e.g., city name, station, or address)" className="font-martian-mono">
+                <FaInfoCircle className="ml-1 w-4 h-4 text-gray-500 dark:text-gray-400 inline-block cursor-help" />
+              </Tooltip>
+
+
+            </label>
+
+            {/* Add a toggle for current location */}
+            
+          </div>
           <div className="relative">
             <input
               type="text"
@@ -193,12 +202,22 @@ export default function Configure() {
               <button
                 type="button"
                 onClick={clearLocation('location')}
-                className="absolute right-2 top-1/2 -translate-y-1/2"
+                className="absolute right-8 top-1/2 -translate-y-1/2"
               >
                 <FaTimes className="w-4 h-4 text-gray-500 dark:text-gray-400 cursor-pointer" />
               </button>
             )}
+
+            <button
+              type="button"
+              onClick={() => handleLocationSelect('location')({ id: 'current', name: 'Current Location', extId: 'current' })}
+              className="absolute right-2 top-1/2 -translate-y-1/2"
+            >
+              <BiCurrentLocation className="w-5 h-5 text-gray-500 dark:text-gray-400 cursor-pointer hover:text-green-300 transition-all duration-300" />
+            </button>
           </div>
+          
+
           {isLoadingLocation && (
             <div className="absolute z-10 w-full bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-md mt-1 p-2 dark:text-white">
               Loading...

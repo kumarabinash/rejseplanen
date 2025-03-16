@@ -29,6 +29,8 @@ export interface Departure {
     name: string;
     date: string;
     Product: Product[];
+    lat: string;
+    lon: string;
 }
 
 export interface DepartureBoardResponse {

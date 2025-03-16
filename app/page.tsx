@@ -6,6 +6,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 import { FaTrain } from "react-icons/fa6";
 import { FaBus } from "react-icons/fa6";
+import { IoMapSharp } from "react-icons/io5";
+import { fetchAddressLookup } from "@/service/addressLookup";
+import { AddressLookupParams } from "./types/address-lookup";
 
 interface DepartureItem {
   type: string;
@@ -16,6 +19,8 @@ interface DepartureItem {
   name: string;
   date: string;
   eta?: string;
+  lat: string;
+  lon: string;
 }
 
 interface Configuration {
@@ -54,6 +59,16 @@ const getRemainingTime = (item: DepartureItem) => {
       seconds
     };
   }
+
+  const getPosition = (): Promise<{ lat: number, lon: number }> => {
+    return new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition((position) => {
+        resolve({ lat: position.coords.latitude, lon: position.coords.longitude });
+      }, (error) => {
+        reject(error);
+      });
+    });
+  };
 
   const populateEta = (items: DepartureItem[]) => {
     const updatedItems = items.map((item) => {
@@ -107,6 +122,8 @@ const getItems = (res: DepartureBoardResponse): DepartureItem[] => {
       name,
       date,
       Product: product,
+      lat,
+      lon,
     } = departure;
 
     return {
@@ -116,7 +133,9 @@ const getItems = (res: DepartureBoardResponse): DepartureItem[] => {
       from,
       time,
       name,
-      date
+      date,
+      lat,
+      lon,
     }
   })
 
@@ -166,9 +185,40 @@ function DepartureBoard() {
           name: directionName || '',
         },
       }
-    }   
+    }
+
+    if (config.location.extId === 'current') {
+      const position = await getPosition();
+
+      const params: AddressLookupParams = {
+          originCoordLat: position.lat.toString(),
+          originCoordLong: position.lon.toString(),
+        };
+
+        try {
+          const data = await fetchAddressLookup(params);
+
+          const location = data.stopLocationOrCoordLocation[0].CoordLocation;
+
+          console.log({ location });
+
+          config.location.extId = location.extId;
+          config.location.name = location.name;
+        } catch (error) {
+          console.error('Error fetching address lookup:', error);
+          router.push('/configure');
+          return;
+        }
+    }
+
+    if (!config?.location.extId) {
+      router.push('/configure');
+      return;
+    }
 
     setConfig(config);
+
+    console.log({ config });
 
     try {
       const params: DepartureBoardParams = {
@@ -278,7 +328,12 @@ function DepartureBoard() {
                         ) : null} 
                         <h2 className="text-lg sm:text-2xl font-bold text-gray-800 dark:text-gray-200 truncate">{item.to}</h2>
                       </div>
-                      <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">From: {item.from}</p>
+                      <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">From: 
+                        <a href={`https://www.google.com/maps?q=${item.lat},${item.lon}`} target="_blank" rel="noopener noreferrer" className="text-blue-500 dark:text-blue-400">
+                          {item.from}
+                          <IoMapSharp className="w-4 h-4 sm:w-4 sm:h-4 text-blue-500 dark:text-blue-400 ml-1 inline-block" />
+                        </a>
+                      </p>
                     </div>
                     <div className="hidden sm:block text-right w-full sm:w-auto">
                       <div className="text-xl sm:text-3xl font-bold text-gray-800 dark:text-gray-200">{formatTime(item.time)}</div>
