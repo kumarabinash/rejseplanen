@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { LocationSearchParams } from '@/app/types/location-search';
 import { useRouter } from 'next/navigation';
-import { FaCopy, FaSave, FaTimes, FaInfoCircle, FaMapMarkerAlt } from "react-icons/fa";
+import { FaCopy, FaSave, FaTimes, FaInfoCircle } from "react-icons/fa";
 import { toast } from 'react-hot-toast';
 import Tooltip from '@mui/material/Tooltip';
 import { BiCurrentLocation } from "react-icons/bi";
