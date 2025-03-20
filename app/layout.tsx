@@ -4,6 +4,7 @@ import { Martian_Mono } from "next/font/google";
 import { Toaster } from 'react-hot-toast';
 import "./globals.css";
 import 'react-tooltip/dist/react-tooltip.css'
+import Script from 'next/script';
 
 const martianMono = Martian_Mono({
   variable: "--font-martian-mono",
@@ -24,6 +25,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <Script src="https://cloud.umami.is/script.js" data-website-id="da91facd-e807-49b3-9f84-d8f5c506dd65" />
+      </head>
       <body
         className={`${martianMono.className}  antialiased bg-white`}
       >
