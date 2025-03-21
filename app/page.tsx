@@ -269,7 +269,7 @@ function DepartureBoard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-2 sm:p-4 relative">
+    <div className="screen-h-minus-8 bg-gray-100 dark:bg-gray-900 p-2 sm:p-4 relative overflow-y-auto">
       <div className="max-w-4xl mx-auto space-y-2 sm:space-y-4">
         {items.length === 0 ? (
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-8 text-center">
@@ -370,7 +370,7 @@ function DepartureBoard() {
 
       <button
         onClick={() => router.push('/configure')}
-        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 bg-[rgb(228,148,62)] dark:bg-[rgb(228,148,62)] text-white p-3 sm:p-4 rounded-full shadow-lg hover:shadow-xl transition-shadow duration-200 flex items-center justify-center"
+        className="fixed bottom-16 right-4 sm:bottom-16 sm:right-6 bg-[rgb(228,148,62)] dark:bg-[rgb(228,148,62)] text-white p-3 sm:p-4 rounded-full shadow-lg hover:shadow-xl transition-shadow duration-200 flex items-center justify-center"
         aria-label="Configure"
       >
         <svg 

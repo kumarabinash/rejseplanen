@@ -171,7 +171,7 @@ export default function Configure() {
   }
 
   return (
-    <div className="flex flex-col gap-4 p-4 max-w-md mx-auto dark:bg-gray-900">
+    <div className="flex flex-col gap-4 p-4 max-w-md mx-auto dark:bg-gray-900 h-screen-minus-8">
       <h1 className="text-2xl font-bold mb-4 dark:text-white">Configure</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="relative">
